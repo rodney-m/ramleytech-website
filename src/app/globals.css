@@ -1,26 +1,154 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* =========================================================
+   THEME SYSTEM
+   Switch themes by setting data-theme on <html>:
+     "dark"     (default) — Deep navy + electric blue
+     "midnight" — Pure black + violet/pink
+     "light"    — Clean white + sky blue
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+   All colors are CSS variables mapped to Tailwind tokens
+   via @theme. Change a theme by editing the variables below.
+   ========================================================= */
+
+@theme {
+  /* Brand */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+
+  /* Surfaces */
+  --color-surface-base: var(--surface-base);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-border: var(--surface-border);
+
+  /* Text */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  /* Glow helpers */
+  --color-glow-primary: var(--glow-primary);
+  --color-glow-secondary: var(--glow-secondary);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---- THEME: dark (default) ---- */
+:root,
+[data-theme="dark"] {
+  --brand-primary: #00d4ff;
+  --brand-secondary: #6c5ce7;
+  --brand-accent: #0aefb5;
+
+  --surface-base: #0b0f19;
+  --surface-raised: #111827;
+  --surface-overlay: #1a2234;
+  --surface-border: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #f0f4ff;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+
+  --glow-primary: rgba(0, 212, 255, 0.15);
+  --glow-secondary: rgba(108, 92, 231, 0.15);
+}
+
+/* ---- THEME: midnight ---- */
+[data-theme="midnight"] {
+  --brand-primary: #a78bfa;
+  --brand-secondary: #f472b6;
+  --brand-accent: #34d399;
+
+  --surface-base: #050508;
+  --surface-raised: #0d0d16;
+  --surface-overlay: #15152a;
+  --surface-border: rgba(167, 139, 250, 0.1);
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #4a5568;
+
+  --glow-primary: rgba(167, 139, 250, 0.2);
+  --glow-secondary: rgba(244, 114, 182, 0.15);
+}
+
+/* ---- THEME: light ---- */
+[data-theme="light"] {
+  --brand-primary: #0284c7;
+  --brand-secondary: #7c3aed;
+  --brand-accent: #059669;
+
+  --surface-base: #f8fafc;
+  --surface-raised: #ffffff;
+  --surface-overlay: #f1f5f9;
+  --surface-border: rgba(0, 0, 0, 0.08);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --glow-primary: rgba(2, 132, 199, 0.1);
+  --glow-secondary: rgba(124, 58, 237, 0.1);
+}
+
+/* =========================================================
+   BASE STYLES
+   ========================================================= */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--surface-base);
+  color: var(--text-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface-base); }
+::-webkit-scrollbar-thumb { background: var(--surface-overlay); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-primary); }
+
+/* Selection */
+::selection { background: var(--brand-primary); color: var(--surface-base); }
+
+/* Focus ring */
+:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+
+/* Gradient text helper */
+.gradient-text {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass card helper */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--surface-border);
+}
+
+/* Glow helpers */
+.glow-primary {
+  box-shadow: 0 0 40px var(--glow-primary);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 40px var(--glow-secondary);
+}
+
+/* Noise texture overlay for depth */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
 }
