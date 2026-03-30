@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
@@ -41,12 +42,14 @@ export default function Navbar() {
           className="flex items-center gap-2 group"
           aria-label="Ramley Technologies home"
         >
-          <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-surface-base font-bold text-sm transition-transform duration-200 group-hover:scale-110">
-            R
-          </div>
-          <span className="font-semibold text-text-primary tracking-tight">
-            Ramley<span className="text-brand-primary">Tech</span>
-          </span>
+          <Image
+            src="/ramley_logo_on_dark_bg.png"
+            alt="Ramley Technologies"
+            width={158}
+            height={36}
+            priority
+            className="h-9 w-auto transition-transform duration-200 group-hover:scale-[1.03]"
+          />
         </Link>
 
         {/* Desktop nav */}

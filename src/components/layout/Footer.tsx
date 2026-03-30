@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin, Globe, Code2, X } from "lucide-react";
 
 const footerLinks = {
@@ -30,12 +31,13 @@ export default function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-surface-base font-bold text-sm">
-                R
-              </div>
-              <span className="font-semibold text-text-primary tracking-tight">
-                Ramley<span className="text-brand-primary">Tech</span>
-              </span>
+              <Image
+                src="/ramley_logo_on_dark_bg.png"
+                alt="Ramley Technologies"
+                width={150}
+                height={34}
+                className="h-8 w-auto"
+              />
             </Link>
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs mb-6">
               Building enterprise-grade software systems for Africa and beyond.
