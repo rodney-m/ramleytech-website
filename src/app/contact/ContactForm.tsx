@@ -6,75 +6,104 @@ import { Send, Loader2 } from "lucide-react";
 type FormState = "idle" | "submitting" | "success" | "error";
 
 const projectTypes = [
-  "Custom software development",
-  "Web application",
-  "Mobile application",
-  "AI / automation system",
-  "Cloud infrastructure",
-  "Fintech / payment system",
-  "System rescue / modernisation",
+  "Custom system",
+  "Product or platform",
+  "Automation / intelligence",
+  "Infrastructure",
+  "Financial system",
+  "Rescue or modernisation",
   "Other",
 ];
 
 export default function ContactForm() {
   const [status, setStatus] = useState<FormState>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("submitting");
-    // Simulate submission — wire up to your API route / form service here
-    await new Promise((r) => setTimeout(r, 1500));
-    setStatus("success");
+    setErrorMessage("");
+
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const payload = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
+
+      if (!res.ok) {
+        setErrorMessage(
+          payload.error ??
+            "Something went wrong. Email us at projects@ramleytech.com."
+        );
+        setStatus("error");
+        return;
+      }
+
+      setStatus("success");
+      form.reset();
+    } catch {
+      setErrorMessage(
+        "Something went wrong. Email us at projects@ramleytech.com."
+      );
+      setStatus("error");
+    }
   };
 
   if (status === "success") {
     return (
-      <div className="glass rounded-2xl p-10 flex flex-col items-center justify-center text-center min-h-80 gap-5">
-        <div className="w-14 h-14 rounded-2xl bg-brand-primary/10 flex items-center justify-center text-brand-primary">
-          <Send size={24} />
+      <div className="rounded-2xl border border-surface-border bg-surface-raised p-10 flex flex-col items-center justify-center text-center min-h-80 gap-5">
+        <div className="w-12 h-12 rounded-full bg-brand-primary/15 flex items-center justify-center text-brand-primary">
+          <Send size={20} />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-text-primary mb-2">
+          <h2 className="font-display text-xl font-bold text-text-primary mb-2">
             Message received
           </h2>
           <p className="text-text-secondary text-sm max-w-xs">
-            We&apos;ll review your project details and get back to you within one
-            business day.
+            We&apos;ll get back within one business day.
           </p>
         </div>
         <button
           onClick={() => setStatus("idle")}
           className="text-brand-primary text-sm hover:underline"
         >
-          Send another message
+          Send another
         </button>
       </div>
     );
   }
 
+  const fieldClass =
+    "bg-surface-overlay border border-surface-border rounded-xl px-4 py-3.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-primary/40 transition-colors";
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="glass rounded-2xl p-8 flex flex-col gap-6"
+      className="rounded-2xl border border-surface-border bg-surface-raised p-8 flex flex-col gap-5"
       noValidate
     >
-      <div>
-        <h2 className="font-semibold text-text-primary text-lg mb-1">
-          Project enquiry
-        </h2>
-        <p className="text-text-muted text-sm">
-          All fields are required unless marked optional.
-        </p>
-      </div>
+      {/* Honeypot — hidden from users */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+        aria-hidden="true"
+      />
 
-      {/* Name + Email row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="name"
-            className="text-xs font-semibold text-text-secondary uppercase tracking-wide"
-          >
-            Full Name
+          <label htmlFor="name" className="text-xs font-medium text-text-muted">
+            Name
           </label>
           <input
             id="name"
@@ -83,15 +112,15 @@ export default function ContactForm() {
             required
             autoComplete="name"
             placeholder="Jane Smith"
-            className="bg-surface-overlay border border-surface-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/30 transition-colors"
+            className={fieldClass}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="email"
-            className="text-xs font-semibold text-text-secondary uppercase tracking-wide"
+            className="text-xs font-medium text-text-muted"
           >
-            Work Email
+            Work email
           </label>
           <input
             id="email"
@@ -100,18 +129,17 @@ export default function ContactForm() {
             required
             autoComplete="email"
             placeholder="jane@company.com"
-            className="bg-surface-overlay border border-surface-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/30 transition-colors"
+            className={fieldClass}
           />
         </div>
       </div>
 
-      {/* Company */}
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor="company"
-          className="text-xs font-semibold text-text-secondary uppercase tracking-wide"
+          className="text-xs font-medium text-text-muted"
         >
-          Company / Organisation
+          Company
         </label>
         <input
           id="company"
@@ -120,27 +148,23 @@ export default function ContactForm() {
           required
           autoComplete="organization"
           placeholder="Acme Corp"
-          className="bg-surface-overlay border border-surface-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/30 transition-colors"
+          className={fieldClass}
         />
       </div>
 
-      {/* Project type */}
       <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="type"
-          className="text-xs font-semibold text-text-secondary uppercase tracking-wide"
-        >
-          Project Type
+        <label htmlFor="type" className="text-xs font-medium text-text-muted">
+          What do you need?
         </label>
         <select
           id="type"
           name="type"
           required
           defaultValue=""
-          className="bg-surface-overlay border border-surface-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/30 transition-colors appearance-none"
+          className={`${fieldClass} appearance-none`}
         >
           <option value="" disabled>
-            Select a category
+            Select one
           </option>
           {projectTypes.map((t) => (
             <option key={t} value={t}>
@@ -150,60 +174,34 @@ export default function ContactForm() {
         </select>
       </div>
 
-      {/* Project description */}
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor="description"
-          className="text-xs font-semibold text-text-secondary uppercase tracking-wide"
+          className="text-xs font-medium text-text-muted"
         >
-          Project Description
+          Tell us more
         </label>
         <textarea
           id="description"
           name="description"
           required
           rows={5}
-          placeholder="Describe the system you need built. Include the problem it solves, rough scale, and any constraints or existing systems we'd need to integrate with."
-          className="bg-surface-overlay border border-surface-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/30 transition-colors resize-none"
+          placeholder="What are you trying to achieve? Any constraints we should know?"
+          className={`${fieldClass} resize-none`}
         />
-      </div>
-
-      {/* Budget (optional) */}
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="budget"
-          className="text-xs font-semibold text-text-secondary uppercase tracking-wide"
-        >
-          Budget Range{" "}
-          <span className="font-normal text-text-muted normal-case tracking-normal">
-            (optional)
-          </span>
-        </label>
-        <select
-          id="budget"
-          name="budget"
-          defaultValue=""
-          className="bg-surface-overlay border border-surface-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/30 transition-colors appearance-none"
-        >
-          <option value="">Prefer not to say</option>
-          <option>Under $10,000</option>
-          <option>$10,000 – $30,000</option>
-          <option>$30,000 – $75,000</option>
-          <option>$75,000 – $150,000</option>
-          <option>$150,000+</option>
-        </select>
       </div>
 
       {status === "error" && (
         <p className="text-red-400 text-sm rounded-xl border border-red-400/20 bg-red-400/5 px-4 py-3">
-          Something went wrong. Please try again or email us directly.
+          {errorMessage ||
+            "Something went wrong. Email us at projects@ramleytech.com."}
         </p>
       )}
 
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand-primary text-surface-base font-semibold text-base hover:opacity-90 hover:scale-[1.01] active:scale-100 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 glow-primary"
+        className="mt-2 inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand-primary text-white font-semibold text-base hover:bg-[#2563eb] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {status === "submitting" ? (
           <>
@@ -212,8 +210,8 @@ export default function ContactForm() {
           </>
         ) : (
           <>
-            <Send size={17} />
-            Start Your Project
+            <Send size={16} />
+            Send message
           </>
         )}
       </button>
